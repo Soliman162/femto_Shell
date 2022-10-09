@@ -1,27 +1,42 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define Inputs_SIZE		10
+#define Inputs_SIZE			10
+#define SET_ENV_VAR			0
+#define SET_ENV_VALUE		1	
+#define SET_ENV_VAR_NUM		10
 
 char * _argv_[10]  ; 
 char Inputs[Inputs_SIZE][Inputs_SIZE]; 
+char *Set_env[SET_ENV_VAR_NUM][2];
 
 /*====================================================================*/
-
+/**
+ * @brief 
+ * 
+ * This function recieve inputs from standard input and store it in ( _argv_  &  Inputs ) 
+ * 
+ */
 static inline void RECIEVE_void_INPUTS(void)
 {
 	int i = 0, j=0, z=0;
 	char Input_Char = '\0'; 
 
-	/*recive inputs */
+	/*receive inputs */
 	while( ( Input_Char = getchar()) != '\n' )
 	{
-		if( Input_Char == ' ' )
+		if( (Input_Char == ' ') || (Input_Char == '=') )
 		{
 			_argv_[j++] = Inputs[i];
+
+			if(  Input_Char == '=' ) 
+			{ 
+				Inputs[++i][0] = '='; 
+			} 
 			i++;
 			z=0;
 		}
@@ -32,7 +47,12 @@ static inline void RECIEVE_void_INPUTS(void)
 }
 
 /*====================================================================*/
-
+/**
+ * @brief 
+ * 
+ * This function clear ( _argv_  &  Inputs ) by set all thier elements to null
+ * 
+ */
 static inline void Clear_void_Strings(void)
 {
 	int i = 0, j=0, z=0;
@@ -54,9 +74,15 @@ int main(void)
 {
     pid_t PID = -1;
     int status = 0;
+	int Set_env_Iterator_1 = 0;
+	int Set_env_Iterator_2 = 0;
 	
 	do{
 			printf("Welcome in my Shell > ");
+
+			/*********************/
+			Clear_void_Strings();
+			/*********************/
 
 			/**********************/
 			RECIEVE_void_INPUTS();
@@ -69,14 +95,33 @@ int main(void)
 				PID = fork();
 				
 				/*The child will excute the command in argv */
-				if (PID == 0){ execvp(_argv_[0],_argv_ ); }
-				
+				if (PID == 0)
+				{ 
+					if( Inputs[1][0] == '=' )
+					{
+						printf("*============================================*\n");
+						Set_env[Set_env_Iterator_1][0] = _argv_[0];
+						Set_env[Set_env_Iterator_1++][1] = _argv_[1];
+
+						/* int setenv(const char *name, const char *value, int overwrite); */
+						setenv( _argv_[0]  , _argv_[1] , 1 );
+					}
+					else if ( _argv_[0] == "set" )
+					{
+						printf("***********\n");
+						for(Set_env_Iterator_2=0;Set_env[Set_env_Iterator_2][0] != NULL ;Set_env_Iterator_2++)
+						{	
+							printf("local variable[%d] : %s = %s",Set_env_Iterator_2,Set_env[Set_env_Iterator_2][0],Set_env[Set_env_Iterator_2][1]);
+						}
+					}
+					else
+					{
+						execvp( _argv_[0] , _argv_ ); 
+					}
+				}
 				/*The parent process will wait for the termination of the child process*/
 				else if (PID>0){ wait(&status); }
 
-				/*********************/
-				Clear_void_Strings();
-				/*********************/
 
 			}
 
