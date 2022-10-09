@@ -4,69 +4,84 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define STRING_COMMAND_SIZE		10
-#define ENTER_KEY				10
+#define Inputs_SIZE		10
 
+char * _argv_[10]  ; 
+char Inputs[Inputs_SIZE][Inputs_SIZE]; 
 
+/*====================================================================*/
+
+static inline void RECIEVE_void_INPUTS(void)
+{
+	int i = 0, j=0, z=0;
+	char Input_Char = '\0'; 
+
+	/*recive inputs */
+	while( ( Input_Char = getchar()) != '\n' )
+	{
+		if( Input_Char == ' ' )
+		{
+			_argv_[j++] = Inputs[i];
+			i++;
+			z=0;
+		}
+		else { Inputs[i][z++] = Input_Char; }
+	}
+	/*Store last input*/
+	_argv_[j] =  Inputs[i];
+}
+
+/*====================================================================*/
+
+static inline void Clear_void_Strings(void)
+{
+	int i = 0, j=0, z=0;
+
+	/*Clear strings and variables*/
+	for(i=0;_argv_[i] != NULL;i++)
+	{
+		_argv_[i] = NULL;
+		for(j=0;Inputs[i][j] != '\0';j++)
+		{
+			Inputs[i][j] = '\0';
+		}
+	}
+}
+
+/*====================================================================*/
 
 int main(void)
 {
     pid_t PID = -1;
     int status = 0;
-	int i = 0, j=0;
-
-	char * string_args[10]  ;
-	char string_command[STRING_COMMAND_SIZE][STRING_COMMAND_SIZE]  ;
-
-	char Input_Char = '\0'; 
 	
-/*===============================================================================================*/
 	do{
-		printf("Welcome in my Shell > ");
+			printf("Welcome in my Shell > ");
 
-		do{
-			if( Input_Char == ' ' )
+			/**********************/
+			RECIEVE_void_INPUTS();
+			/*********************/
+
+			/*check for the Recived inputs if it is empty*/
+			if( Inputs[0][0] != '\0' )
 			{
-				string_args[j++] = string_command;
-				//printf("%s",string_args[j-1]);
-				//string_args[j] = NULL;
+				/*Create the child process using fork*/
+				PID = fork();
+				
+				/*The child will excute the command in argv */
+				if (PID == 0){ execvp(_argv_[0],_argv_ ); }
+				
+				/*The parent process will wait for the termination of the child process*/
+				else if (PID>0){ wait(&status); }
 
-				for(i=0;i<STRING_COMMAND_SIZE;i++){string_command[i] = '\0';}
+				/*********************/
+				Clear_void_Strings();
+				/*********************/
 
-				i=0;
 			}
-			else
-			{
-				string_command[i++] = Input_Char;
-			}
 
-		}while( ( c = getchar()) != '\n' );
-
-		//printf("%s\n",string_command);
-
-		if( string_command[0] != '\0' )
-		{
-
-			PID = fork();
-
-			if (PID == 0) 
-			{
-				//printf("string_args[0] = %s\n",string_args[0]);
-				execvp(string_args[0],string_args );
-			}
-			else if (PID < 0) 
-			{
-				printf("fork faild\n");
-			}
-			else if (PID>0)
-			{
-				wait(&status);
-			}
-		}
-		
-	}
-	while ( strcmp(string_command, "Exit") );
-/*===============================================================================================*/
+	}/*check if it should Exit */
+	while ( strcmp(Inputs[0], "Exit") );
 
 	printf("good bye:)\n");
 
