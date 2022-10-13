@@ -5,9 +5,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
-#define Inputs_SIZE			10
-#define SET_ENV_VAR			0
-#define SET_ENV_VALUE		1	
+#define Inputs_SIZE			10	
 #define SET_ENV_VAR_NUM		10
 
 char * _argv_[10]  ; 
@@ -98,41 +96,17 @@ int main(void)
 				{ 
 					if( Inputs[1][0] == '=' )
 					{
-						/*char *Set_env_var[];
-						char *set_env_value[];*/
-						printf("*============================================*\n");
-						printf("_argv_[0] = %s\n",_argv_[0]);
-						printf("_argv_[1] = %s\n",_argv_[1]);
-						printf("*============================================*\n");
-
 						Set_env_var[Set_env_Iterator_1] = _argv_[0]; 
 						set_env_value[Set_env_Iterator_1] = _argv_[1];
 
-						/* int setenv(const char *name, const char *value, int overwrite); */
-						setenv( _argv_[0]  , _argv_[1] , 1 );
-						printf("Set_env_var[%d] = %s\n", Set_env_Iterator_1 ,Set_env_var[Set_env_Iterator_1]);
-						printf("Set_env_value[%d] = %s\n", Set_env_Iterator_1 ,set_env_value[Set_env_Iterator_1]);
-
-						Set_env_Iterator_1++;
-					}
-					else if ( Inputs[0][0] == 's' && Inputs[0][1] == 'e' && Inputs[0][2] == 't' )
-					{
-						
-						printf("*========================================*********************************====*\n");
-						printf("_argv_[0] = %s\n",_argv_[0]);
-						printf("_argv_[1] = %s\n",_argv_[1]);
-						printf("*=======================================**************************************=====*\n");
-
-						printf("*==========================================================================================*\n");
-						for( Set_env_Iterator_2=0; Set_env_var[Set_env_Iterator_2]!=NULL && set_env_value[Set_env_Iterator_2]!=NULL ;Set_env_Iterator_2++ )
+						if( setenv( _argv_[0]  , _argv_[1] , 1 ) != -1 )
 						{
-							printf("\nSet_env_var[%d] = %s\n",Set_env_Iterator_2,Set_env_var[Set_env_Iterator_2]);
-							printf("\nset_env_value[%d] = %s\n",Set_env_Iterator_2,set_env_value[Set_env_Iterator_2]);
+							printf("setenv success \n");
 						}
+						Set_env_Iterator_1++;
 					}
 					else
 					{
-						printf("hello from execvp\n");
 						execvp( _argv_[0] , _argv_ ); 
 					}
 				}
