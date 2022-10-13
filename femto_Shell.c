@@ -14,7 +14,6 @@ char * _argv_[10]  ;
 char Inputs[Inputs_SIZE][Inputs_SIZE]; 
 char *Set_env[SET_ENV_VAR_NUM][2];
 
-/*====================================================================*/
 /**
  * @brief 
  * 
@@ -43,10 +42,9 @@ static inline void RECIEVE_void_INPUTS(void)
 		else { Inputs[i][z++] = Input_Char; }
 	}
 	/*Store last input*/
-	_argv_[j] =  Inputs[i];
+	_argv_[j] = Inputs[i];
 }
 
-/*====================================================================*/
 /**
  * @brief 
  * 
@@ -68,8 +66,6 @@ static inline void Clear_void_Strings(void)
 	}
 }
 
-/*====================================================================*/
-
 int main(void)
 {
     pid_t PID = -1;
@@ -84,7 +80,7 @@ int main(void)
 			Clear_void_Strings();
 			/*********************/
 
-			/**********************/
+			/*********************/
 			RECIEVE_void_INPUTS();
 			/*********************/
 
@@ -100,29 +96,22 @@ int main(void)
 					if( Inputs[1][0] == '=' )
 					{
 						printf("*============================================*\n");
-						Set_env[Set_env_Iterator_1][0] = _argv_[0];
+						Set_env[Set_env_Iterator_1][0] = _argv_[0]; 
 						Set_env[Set_env_Iterator_1++][1] = _argv_[1];
 
 						/* int setenv(const char *name, const char *value, int overwrite); */
 						setenv( _argv_[0]  , _argv_[1] , 1 );
-					}
-					else if ( _argv_[0] == "set" )
-					{
-						printf("***********\n");
-						for(Set_env_Iterator_2=0;Set_env[Set_env_Iterator_2][0] != NULL ;Set_env_Iterator_2++)
-						{	
-							printf("local variable[%d] : %s = %s",Set_env_Iterator_2,Set_env[Set_env_Iterator_2][0],Set_env[Set_env_Iterator_2][1]);
-						}
+						printf("Set_env[%d][0] = %s\n", Set_env_Iterator_1-1 ,Set_env[Set_env_Iterator_1-1][0]);
+						printf("Set_env[%d][1] = %s\n", Set_env_Iterator_1 ,Set_env[Set_env_Iterator_1-1][1]);
 					}
 					else
 					{
+						printf("hello from execvp\n");
 						execvp( _argv_[0] , _argv_ ); 
 					}
 				}
 				/*The parent process will wait for the termination of the child process*/
 				else if (PID>0){ wait(&status); }
-
-
 			}
 
 	}/*check if it should Exit */
